@@ -1,11 +1,12 @@
 ### lodash 源码学习
-#### add.js
+####add.js
+
+`lodash.add`是一个很简单的函数，将两个数字相加，我直接找到lodash中`add`的源码实现如下
 ```
 const add = createMathOperation((augend, addend) => augend + addend, 0)
 ```
-add是一个很简单的函数，将两个数字相加
 
-当我们使用`add`方法的时候，实际使用的是`createMathOperation`生成出的方法。
+我们可以发现，当我们使用`add`方法的时候，实际使用的是`createMathOperation`生成出的方法。
 ```
 function createMathOperation(operator, defaultValue) {
   return (value, other) => {
@@ -15,9 +16,12 @@ function createMathOperation(operator, defaultValue) {
   }
 }
 ```
-搜索一下`createMathOperation`方法，我发现这个方法共被使用了4次，对应的局势加减乘除。
+那么`createMathOperation`方法的作用是什么呢，
+搜索一下`createMathOperation`方法，我发现这个方法共被使用了4次，对应的就是`lodash`中的加减乘除操作。
 
-`createMathOperation`方法的主要用途是什么呢？
+由此我们思考一下，`createMathOperation`方法的主要用途是什么呢？
+先来看一下这个方法源码
+如下：`value`为`add`方法的第一个参数，`other`为第二个参数
 ```
 	if (value === undefined && other === undefined) {
       return defaultValue
@@ -53,7 +57,7 @@ return (result == '0' && (1 / value) == -INFINITY) ? '-0' : result
 
 第一行是将 value 直接转换为 字符串类型，之前我使用的方法一般是`value+''`，看了这个又有了更好的一个选择
 
-第二行 根据我的分析，这行代码是将数字`-0`转换为字符串`'-0'`，这行代码的双等，涉及了很多隐式转换 ，如果 value  = `-0`
+第二行 根据我的分析，这行代码是将数字`-0`转换为字符串`'-0'`，这行代码的双等，涉及了很多隐式转换 ，如果传入 `value`  = `-0`
 ```
 const result = `${value}` //'0'
 '0'=='0'// true
@@ -86,5 +90,5 @@ function baseToNumber(value) {
 }
 ```
 转换为数字
-一个很细节的点`+value`可以方便的将值转换为`number`类型，涉及到的是`+`的隐式转换
+一个很细节的点`+value`可以方便的将值转换为`number`类型，涉及到的是`+`操作符的隐式转换。
 
